@@ -31,14 +31,19 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define GPIO_LCD_BACKLIGHT     2
-#define GPIO_BT_UART_SELECT    20
-#define GPIO_SOM_REV_BIT0_GPIO 77
-#define GPIO_SOM_REV_BIT1_GPIO 86
-#define GPIO_SOM_REV_BIT2_GPIO 75
+#define CONFIG_NETICO_VERSION           "1.0b"
 
-#define GPIO_PHY1_RST          83
-#define GPIO_PHY2_RST          106
+#define GPIO_PIN_TO_ID(port, pin)       (((port) * 32u) + (pin))
+
+#define GPIO_LCD_BACKLIGHT              GPIO_PIN_TO_ID(2, 11)
+#define GPIO_BUZZER                     GPIO_PIN_TO_ID(3, 7)
+
+#define GPIO_BT_UART_SELECT             20
+#define GPIO_SOM_REV_BIT0_GPIO          77
+#define GPIO_SOM_REV_BIT1_GPIO          86
+#define GPIO_SOM_REV_BIT2_GPIO          75
+#define GPIO_PHY1_RST                   83
+
 
 static struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
 static int som_rev = (-1);
@@ -155,32 +160,6 @@ void set_mux_conf_regs(void)
 	gpio_set_value(GPIO_PHY1_RST, 1);
 
 	enable_rmii1_pin_mux();
-
-	/* Reset the RGMII ethernet chip.
-	 */
-	gpio_request(GPIO_PHY2_RST, "phy2_rst");
-	gpio_request(55, "rgmii_phyaddr2");
-	gpio_request(56, "rgmii_mode0");
-	gpio_request(57, "rgmii_mode1");
-	gpio_request(58, "rgmii_mode2");
-	gpio_request(59, "rgmii_mode3");
-	gpio_request(49, "rgmii_clk125_ena");
-
-	gpio_direction_output(55, 1);
-	gpio_direction_output(56, 1);
-	gpio_direction_output(57, 1);
-	gpio_direction_output(58, 1);
-	gpio_direction_output(59, 1);
-	gpio_direction_output(49, 1);
-	gpio_direction_output(GPIO_PHY2_RST, 1);
-
-	udelay(10000);
-	gpio_set_value(GPIO_PHY2_RST, 0);
-	udelay(10000);
-	gpio_set_value(GPIO_PHY2_RST, 1);
-	udelay(10000);
-
-	enable_rgmii2_pin_mux();
 }
 
 void sdram_init(void)
@@ -245,6 +224,10 @@ int board_init(void)
 		som_rev_major = -1;
 		som_rev_minor = -1;
 	}
+	
+	printf("\n\n===========================================\n");
+	printf("          Netico bootloader " CONFIG_NETICO_VERSION " \n");
+	printf("===========================================\n\n");
 
 	if (som_rev > 0)
 		printf("Variscite AM33 SOM revision %d.%d detected\n",
@@ -253,15 +236,19 @@ int board_init(void)
 		printf("ERROR: unknown Variscite AM33X SOM revision.\n");
 		hang();
 	}
+	printf("===========================================\n\n");
 
 	/* Turn off LCD */
 	gpio_request(GPIO_LCD_BACKLIGHT, "backlight");
 	gpio_direction_output(GPIO_LCD_BACKLIGHT, 0);
 
+    /* Turn off Buzzer */
+    gpio_request(GPIO_BUZZER, "buzzer");
+    gpio_direction_output(GPIO_BUZZER, 0);
+    
 	/* mux bluetooth to omap */
 	gpio_request(GPIO_BT_UART_SELECT, "bt_uart_select");
 	gpio_direction_output(GPIO_BT_UART_SELECT, 1);
-
 #endif
 
 	return 0;

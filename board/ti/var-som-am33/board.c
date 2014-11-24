@@ -35,7 +35,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define GPIO_PIN_TO_ID(port, pin)       (((port) * 32u) + (pin))
 
-#define GPIO_LCD_BACKLIGHT              GPIO_PIN_TO_ID(2, 11)
+#define GPIO_LCD_BACKLIGHT              GPIO_PIN_TO_ID(1, 21)
 #define GPIO_BUZZER                     GPIO_PIN_TO_ID(3, 7)
 
 #define GPIO_BT_UART_SELECT             20

@@ -18,7 +18,7 @@
  * is required on the board.
  */
 void enable_uart0_pin_mux(void);
+void enable_uart3_pin_mux(void);
 void enable_rmii1_pin_mux(void);
-void enable_rgmii2_pin_mux(void);
 void enable_board_pin_mux(void);
 #endif
